@@ -1,15 +1,12 @@
 package com.example.matiastibaldo.cancioneromaestrodonbosco.CInterfaces;
 
-import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.ListFragment;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.util.Log;
-import android.view.View;
+import android.os.Handler;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -32,8 +29,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -41,20 +36,47 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+
         navigationView.setNavigationItemSelectedListener(this);
-        ListaCanciones fragment = new ListaCanciones();
-        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.Contenedor, fragment).addToBackStack(null).commit();
+
+        if (savedInstanceState == null) {
+            onNavigationItemSelected(navigationView.getMenu().getItem(0));
+
+        }
     }
 
+    private boolean canExitApp = false;
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
+
+        DetalleCancion test = (DetalleCancion) getSupportFragmentManager().findFragmentByTag("Detalle Cancion");
+        if (test != null && test.isVisible()) {            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+               if (drawer.isDrawerOpen(GravityCompat.START)) {
+                   drawer.closeDrawer(GravityCompat.START);
+               } else {
+                   super.onBackPressed();
+               }
+
+           }else{
+               if (!canExitApp) {
+                   canExitApp = true;
+                   Toast.makeText(this, "Presione nuevamente para salir", Toast.LENGTH_SHORT).show();
+
+                   new Handler().postDelayed(new Runnable() {
+
+                       @Override
+                       public void run() {
+                           canExitApp = false;
+                       }
+                   }, 2000);
+               } else {
+                   super.onBackPressed();
+               }
+           }
+
+
+
+
     }
 
     @Override
@@ -73,63 +95,51 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
-
+    android.support.v4.app.Fragment fragment=null;
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        int id = item.getItemId();
 
-        if (id == R.id.Canciones) {
+        switch (item.getItemId()){
+            case R.id.Contenedor:
+                fragment=new ListaCanciones();
+                break;
 
-            ListaCanciones fragment = new ListaCanciones();
-            android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.Contenedor, fragment).addToBackStack(null).commit();
+            case R.id.Canciones:
+                fragment=new ListaCanciones();
+                break;
 
-            // Handle the camera action
-        } else if (id == R.id.Cancionero) {
-            TodasLasCanciones fragment = new TodasLasCanciones();
-            android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.Contenedor, fragment).addToBackStack(null).commit();
+            case R.id.Cancionero:
+                fragment= new TodasLasCanciones();
+                break;
 
-        }else if (id == R.id.Ayuda) {
-            enviarEmail();
+            case R.id.Ayuda:
+                enviarEmail();
+                break;
 
-        }else if (id == R.id.AcercaDe) {
-            AcercaDe fragment = new AcercaDe();
-            android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.Contenedor, fragment).addToBackStack(null).commit();
+            case R.id.AcercaDe:
+                fragment= new AcercaDe();
+                break;
 
-        } /*else if (id == R.id.nav_share) {
+        }
+        if (fragment != null) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.Contenedor, fragment);
+            ft.commit();
 
-        } else if (id == R.id.nav_send) {
-
-        }*/
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
+        }
         return true;
+
     }
 
     private void enviarEmail() {
-        String[] TO = {"matias.tiba@gmail.com" ,"mtibaldo@frsf.utn.edu.ar "}; //Direcciones email  a enviar.
-        String[] CC = {""}; //Direcciones email con copia.
-
-        Intent emailIntent = new Intent(Intent.ACTION_SEND);
-
-        emailIntent.setData(Uri.parse("mailto:"));
-        emailIntent.setType("text/plain");
-        emailIntent.putExtra(Intent.EXTRA_EMAIL, TO);
-        emailIntent.putExtra(Intent.EXTRA_CC, CC);
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Ayuda/sugerencia Cancionero Maestro");
-        emailIntent.putExtra(Intent.EXTRA_TEXT, ""); // * configurar email aquí!
-
-        try {
-            startActivity(Intent.createChooser(emailIntent, "Enviar email."));
-            Log.i("EMAIL", "Enviando email...");
-        }
-        catch (android.content.ActivityNotFoundException e) {
-            Toast.makeText(this, "NO existe ningún cliente de email instalado!.", Toast.LENGTH_SHORT).show();
-        }
+        Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto","matias.tiba@gmail.com", null));
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Ayuda/Sugerencia Cancionero Maestro Don Bosco");
+        emailIntent.putExtra(Intent.EXTRA_TEXT, "");
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {"mtibaldo@frsf.utn.edu.ar"});
+        startActivity(Intent.createChooser(emailIntent, "Enviar email via..."));
     }
 }

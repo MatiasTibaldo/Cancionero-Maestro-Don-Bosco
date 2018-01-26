@@ -32,7 +32,6 @@ public class TodasLasCanciones extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.fragment_detalle_cancion);
         Bundle bundle = this.getArguments();
 
 

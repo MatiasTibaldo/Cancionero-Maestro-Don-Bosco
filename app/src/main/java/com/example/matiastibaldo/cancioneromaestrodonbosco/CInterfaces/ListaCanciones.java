@@ -47,7 +47,7 @@ public class ListaCanciones extends android.support.v4.app.Fragment {
             nombreCanciones.add(canciones.get(i).getNombre());
         }
         listView1 = (ListView)getView().findViewById(R.id.listView1);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1,nombreCanciones);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), R.layout.list_view_item,nombreCanciones);
         listView1.setAdapter(adapter);
         listView1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -63,7 +63,7 @@ public class ListaCanciones extends android.support.v4.app.Fragment {
                 fragment.setArguments(bundle);
 
                 android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.Contenedor, fragment).addToBackStack(null).commit();
+                fragmentManager.beginTransaction().replace(R.id.Contenedor, fragment, "Detalle Cancion").addToBackStack(null).commit();
 
             }
         });

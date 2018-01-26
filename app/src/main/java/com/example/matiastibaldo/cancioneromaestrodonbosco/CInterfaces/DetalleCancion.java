@@ -33,7 +33,6 @@ public class DetalleCancion extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.fragment_detalle_cancion);
         Bundle bundle = this.getArguments();
         int pagina=0;
         if (bundle != null) {
@@ -49,5 +48,6 @@ public class DetalleCancion extends Fragment {
         pdfView.fitToWidth(1);
 
     }
+
 
 }
